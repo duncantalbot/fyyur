@@ -171,7 +171,6 @@ def create_venue_submission():
 
   error = False
   try:   
-    print('CREATE')
     name = request.form['name']
     city = request.form['city']
     state = request.form['state']
@@ -197,9 +196,7 @@ def create_venue_submission():
       seeking_talent=seeking_talent,
       seeking_description=seeking_description,
     )
-    print(venue)
     db.session.add(venue)
-    print(venue)
     db.session.commit()
   except:
     error = True
@@ -218,7 +215,7 @@ def create_venue_submission():
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
- 
+  print('DELETE')
   error = False
   try:
     venue = Venue.query.get(venue_id)
@@ -227,14 +224,15 @@ def delete_venue(venue_id):
   except:
     error = True
     db.session.rollback()
+    print(sys.exc_info())
   finally:
     db.session.close()
 
   if not error:
-    flash(f'Venue {venue.id} was successfully removed!')
+    flash('Venue was successfully removed!')
   if error:
-    flash(f'An error occurred. Venue {venue.id} could not be removed!')
-  return None
+    flash('Venue could not be removed!')
+  return render_template('pages/home.html')
 
 
 #  Artists
@@ -326,19 +324,19 @@ def edit_artist(artist_id):
 
   form = ArtistForm()
 
-  artist_data = Artist.query.get(artist_id)
+  artist = Artist.query.get(artist_id)
 
-  if artist_data:
-    form.name.data = artist_data.name
-    form.genres.data = artist_data.genres
-    form.city.data = artist_data.city
-    form.state.data = artist_data.state
-    form.phone.data = artist_data.phone
-    form.website.data = artist_data.website
-    form.facebook_link.data = artist_data.facebook_link
-    form.seeking_venue.data = artist_data.seeking_venue
-    form.seeking_description = artist_data.seeking_description
-    form.image_link = artist_data.image_link
+  if artist:
+    form.name.data = artist.name
+    form.genres.data = artist.genres
+    form.city.data = artist.city
+    form.state.data = artist.state
+    form.phone.data = artist.phone
+    form.website.data = artist.website
+    form.facebook_link.data = artist.facebook_link
+    form.seeking_venue.data = artist.seeking_venue
+    form.seeking_description.data = artist.seeking_description
+    form.image_link.data = artist.image_link
   return render_template('forms/edit_artist.html', form=form, artist=artist)
 
 
@@ -346,30 +344,31 @@ def edit_artist(artist_id):
 def edit_artist_submission(artist_id):
   
   error = False
-  artist_data = Artist.query.get(artist_id)
+  artist = Artist.query.get(artist_id)
 
   try:
-    artist_data.name = request.form['name']
-    artist_data.genres = request.form.getlist('genres')
-    artist_data.city = request.form['city']
-    artist_data.state = request.form['state']
-    artist_data.phone = request.form['phone']
-    artist_data.website = requet.form['website']
-    artist_data.facebook_link = request.form['facebook_link']
-    artist_data.seeking_venue = request.form['seeking_venue']
-    artist_data.seeking_description = request.form['seeking_description']
-    artist_data.image_link = request.form['image_link']
+    artist.name = request.form['name']
+    artist.genres = request.form.getlist('genres')
+    artist.city = request.form['city']
+    artist.state = request.form['state']
+    artist.phone = request.form['phone']
+    artist.website = request.form['website']
+    artist.facebook_link = request.form['facebook_link']
+    artist.seeking_venue = True if 'seeking_venue' in request.form else False
+    artist.seeking_description = request.form['seeking_description']
+    artist.image_link = request.form['image_link']
     db.session.commit()
   except:
     error = True
     db.session.rollback()
+    print(sys.exc_info())
   finally:
     db.session.close()
 
   if not error:
-    flash(f'Artist {artist_data.name} was successfully updated!')
+    flash('Artist updated!')
   if error:
-    flash(f'An error occurred. Artist {artist_data.name} could not be updated!')
+    flash('Artist could not be updated!')
   return redirect(url_for('show_artist', artist_id=artist_id))
 
 
@@ -388,9 +387,9 @@ def edit_venue(venue_id):
     form.phone.data = venue.phone
     form.website.data = venue.website
     form.facebook_link.data = venue.facebook_link
-    form.seeking_venue.data = venue.seeking_venue
-    form.seeking_description = venue.seeking_description
-    form.image_link = venue.image_link
+    form.seeking_talent.data = venue.seeking_talent
+    form.seeking_description.data = venue.seeking_description
+    form.image_link.data = venue.image_link
   return render_template('forms/edit_venue.html', form=form, venue=venue)
 
 
@@ -405,22 +404,23 @@ def edit_venue_submission(venue_id):
     venue.city = request.form['city']
     venue.state = request.form['state']
     venue.phone = request.form['phone']
-    venue.website = requet.form['website']
+    venue.website = request.form['website']
     venue.facebook_link = request.form['facebook_link']
-    venue.seeking_talent = request.form['seeking_talent']
+    venue.seeking_talent = True if 'seeking_talent' in request.form else False
     venue.seeking_description = request.form['seeking_description']
     venue.image_link = request.form['image_link']
     db.session.commit()
   except:
     error = True
     db.session.rollback()
+    print(sys.exc_info())
   finally:
     db.session.close()
 
   if not error:
-    flash(f'Venue {venue.name} was successfully updated!')
+    flash('Venue was successfully updated!')
   if error:
-    flash(f'An error occurred. Venue {venue.name} could not be updated!')
+    flash('Venue could not be updated!')
 
   return redirect(url_for('show_venue', venue_id=venue_id))
 
@@ -466,6 +466,7 @@ def create_artist_submission():
   except:
     error = True
     db.session.rollback()
+    print(sys.exc_info())
   finally:
     db.session.close()
 
@@ -517,6 +518,7 @@ def create_show_submission():
   except:
     error = True
     db.session.rollback()
+    print(sys.exc_info())
   finally:
     db.session.close()
 

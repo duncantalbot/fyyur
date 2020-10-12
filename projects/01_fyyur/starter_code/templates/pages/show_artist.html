@@ -38,6 +38,11 @@
 			<i class="fas fa-moon"></i> Not currently seeking performance venues
 		</p>
 		{% endif %}
+		<div>
+			<a href="/artists/{{artist.id}}/edit">
+				<button class="btn btn-default btn-lg">Edit</button></a>
+			</a>
+		</div>
 	</div>
 	<div class="col-sm-6">
 		<img src="{{ artist.image_link }}" alt="Venue Image" />
